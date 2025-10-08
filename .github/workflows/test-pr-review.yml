@@ -28,9 +28,18 @@ jobs:
           api-base-url: ${{ secrets.CUSTOM_API_BASE_URL }}
           model: ${{ secrets.CUSTOM_MODEL }}
           prompt: |
-            Analyze the code changes in this repository and provide feedback.
-            Focus on code quality, potential bugs, and improvements.
-            Keep the response concise.
+            Analyze ONLY the code changes introduced by this pull request using git diff.
+            Perform a comprehensive security review of the changed code:
+            - Look for API key exposure, hardcoded secrets, credential leaks
+            - Check for injection vulnerabilities (SQL, command, XSS)
+            - Identify privilege escalation risks
+            - Find unsafe file operations or path traversal issues
+            - Detect insecure data handling or storage
+            - Review authentication/authorization logic
+            - Check for unsafe deserialization or parsing
+            Focus on both code quality and security vulnerabilities.
+            Provide specific, actionable security recommendations.
+            Keep the response concise and focused on the PR changes.
 
       - name: Post review comment
         if: github.event_name == 'pull_request' && steps.review.outputs.final-message != ''
