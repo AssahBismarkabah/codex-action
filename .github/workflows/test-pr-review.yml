@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,25 +22,48 @@ jobs:
       - name: Review code with custom AI endpoint
         id: review
         # uses: ./ tells GitHub to look for action.yml in the repo root
-        # action.yml (in this repo) defines the steps that run dist/main.js
         uses: ./
         with:
           api-key: ${{ secrets.CUSTOM_API_KEY }}
           api-base-url: ${{ secrets.CUSTOM_API_BASE_URL }}
           model: ${{ secrets.CUSTOM_MODEL }}
           prompt: |
-            Analyze ONLY the code changes introduced by this pull request using git diff.
-            Perform a comprehensive security review of the changed code:
-            - Look for API key exposure, hardcoded secrets, credential leaks
-            - Check for injection vulnerabilities (SQL, command, XSS)
-            - Identify privilege escalation risks
-            - Find unsafe file operations or path traversal issues
-            - Detect insecure data handling or storage
-            - Review authentication/authorization logic
-            - Check for unsafe deserialization or parsing
-            Focus on both code quality and security vulnerabilities.
-            Provide specific, actionable security recommendations.
-            Keep the response concise and focused on the PR changes.
+            You are a senior software engineer performing an in-depth code review of a pull request.
+            The input will contain the pull request title, description, and code diff.
+            Your goal is to produce a professional review comment in Markdown format.
+
+            **Instructions:**
+            1. Understand the PR purpose from its title and description.
+            2. Examine the code changes for:
+               - Logic errors or bugs
+               - Code quality and readability
+               - Architecture and design consistency
+               - Security or performance risks
+               - Test coverage and documentation gaps
+            3. Give specific, actionable feedback — mention file names and lines if possible.
+            4. Summarize your findings under clear sections:
+               -  PR Summary
+               -  Issues to Address
+               -  Suggestions or Improvements
+               -  Good Practices
+
+            **Output format (Markdown):**
+            ```
+            ##  PR Review Summary
+            **Intent:** <one-line summary>
+
+            ###  Issues to Address
+            1. **[file:line]** - <problem + suggestion>
+
+            ###  Suggestions / Enhancements
+            - <ideas for better structure, clarity, or efficiency>
+
+            ###  Good Practices
+            - <positive notes or patterns worth keeping>
+            ```
+
+            Be concise but thorough, constructive, and professional.
+            Avoid generic praise. Focus on helping the developer improve code quality and maintainability.
 
       - name: Post review comment
         if: github.event_name == 'pull_request' && steps.review.outputs.final-message != ''
@@ -50,7 +74,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: '## AI Code Review\n\n' + process.env.REVIEW
+              body: '##  AI Code Review\n\n' + process.env.REVIEW
             });
         env:
           REVIEW: ${{ steps.review.outputs.final-message }}
@@ -60,5 +84,5 @@ jobs:
           echo " Test completed!"
           echo "AI endpoint used: ${{ secrets.CUSTOM_API_BASE_URL }}"
           echo ""
-          echo "Review output:"
+          echo " Review output:"
           echo "${{ steps.review.outputs.final-message }}"
