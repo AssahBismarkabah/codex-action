@@ -1,5 +1,7 @@
 # Codex Action for OpenAI-Compatible APIs
 
+> **Testing enhanced PR review with intelligent diff truncation**
+
 Run [Codex](https://github.com/openai/codex#codex-exec) from a GitHub Actions workflow with support for any OpenAI-compatible API endpoint. This action handles installing the Codex CLI and configuring it with your preferred AI provider.
 
 Supports **OpenAI**, **Kimi**, **Fireworks AI**, and any OpenAI-compatible API endpoint. Users can provide their API key as a [GitHub Actions secret](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) to use this action.
