@@ -40,7 +40,9 @@ jobs:
           fi
           
           cat > /tmp/review-prompt.txt << 'EOF'
-          Review this PR for logic errors, security issues, and code quality. Provide specific, actionable feedback with file:line references.
+          You are reviewing a PR with codebase exploration tools (list_dir, grep_files, read_file).
+          
+          IMPORTANT: After exploring, you MUST provide a final review in this format:
 
           ## PR Review Summary
           **Intent:** [one-line summary]
