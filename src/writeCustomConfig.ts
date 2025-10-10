@@ -7,8 +7,8 @@ import { checkOutput } from "./checkOutput";
 const MODEL_PROVIDER = "custom-openai";
 
 export async function writeCustomConfig(
-  baseUrl: string,
   codexHome: string,
+  baseUrl: string,
   safetyStrategy: SafetyStrategy,
   model?: string
 ): Promise<void> {
