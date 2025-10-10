@@ -40,8 +40,20 @@ jobs:
           fi
           
           cat > /tmp/review-prompt.txt << 'EOF'
-          You are reviewing a PR with codebase exploration tools (list_dir, grep_files, read_file).
-          
+          You are reviewing a pull request with FULL CODEBASE EXPLORATION capabilities.
+
+          ## Available Tools
+          Before reviewing, you can use these tools to explore the codebase:
+          - list_dir - List files and directories to understand project structure
+          - grep_files - Search for code patterns across the codebase
+          - read_file - Read any file to understand context
+
+          ## Review Strategy
+          1. Use list_dir to understand the project structure
+          2. Use grep_files to find related code patterns
+          3. Use read_file to examine files related to the changes
+          4. Provide comprehensive, context-aware feedback
+
           IMPORTANT: After exploring, you MUST provide a final review in this format:
 
           ## PR Review Summary
@@ -56,6 +68,8 @@ jobs:
           ### Good Practices
           - [positive notes]
 
+          ---
+
           PR Title: ${{ github.event.pull_request.title }}
           PR Description: ${{ github.event.pull_request.body }}
 
@@ -65,7 +79,7 @@ jobs:
           echo "" >> /tmp/review-prompt.txt
           
           if [ "$TRUNCATED" = true ]; then
-            echo "⚠️ Note: This is a large PR. Diff has been truncated for review. Focus on the changes shown." >> /tmp/review-prompt.txt
+            echo " Note: This is a large PR. Diff has been truncated for review. Focus on the changes shown." >> /tmp/review-prompt.txt
             echo "" >> /tmp/review-prompt.txt
           fi
           
@@ -80,6 +94,7 @@ jobs:
           api-base-url: ${{ secrets.CUSTOM_API_BASE_URL }}
           model: ${{ secrets.CUSTOM_MODEL }}
           prompt-file: /tmp/review-prompt.txt
+          working-directory: ${{ github.workspace }}
 
       - name: Post review comment
         if: github.event_name == 'pull_request' && steps.review.outputs.final-message != ''
